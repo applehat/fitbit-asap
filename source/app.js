@@ -113,7 +113,7 @@ peerSocket.addEventListener("message", event => {
 const asap = {
   debug: false,
   setDebug: (bool) => {
-	  this.debug = bool;
+	  asap.debug = bool ? true : false;
   },
   send: send,
   onmessage: () => {}
