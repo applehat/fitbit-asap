@@ -1,8 +1,6 @@
 import { localStorage } from "local-storage";
 import { peerSocket } from "messaging"
 
-const debug = false
-
 const get_queue = () => {
   try {
     const queue = JSON.parse(localStorage.getItem("_asap_queue"))
@@ -12,13 +10,13 @@ const get_queue = () => {
       return []
     }
   } catch (error) {
-	asap.debug && console.log(error)
+	asap.ondebug(error)
     return []
   }
 }
 
 const enqueue = (data) => {
-  asap.debug && console.log("Enqueue Message ID #" + data._asap_id)
+ asap.ondebug("Enqueue Message ID #" + data._asap_id)
   // Add the message to the queue
   const queue = get_queue()
   queue.push(data)
@@ -26,14 +24,14 @@ const enqueue = (data) => {
   try {
     localStorage.setItem("_asap_queue", JSON.stringify(queue))
   } catch (error) {
-    asap.debug && console.log(error)
+   asap.ondebug(error)
   }
   // Attempt to send all data
   send_all()
 }
 
 const dequeue = (id) => {
-  asap.debug && console.log("Dequeue Message ID #" + id)
+ asap.ondebug("Dequeue Message ID #" + id)
   // Remove the message from the queue
   const queue = get_queue()
   for (let i in queue) {
@@ -46,7 +44,7 @@ const dequeue = (id) => {
   try {
     localStorage.setItem("_asap_queue", JSON.stringify(queue))
   } catch (error) {
-    asap.debug && console.log(error)
+   asap.ondebug(error)
   }
 }
 
@@ -73,7 +71,7 @@ const send_all = () => {
     try {
       peerSocket.send(data)
     } catch (error) {
-      asap.debug && console.log(error)
+     asap.ondebug(error)
     }
   }
 }
@@ -98,7 +96,7 @@ peerSocket.addEventListener("message", event => {
             peerSocket.send({_asap_status: "received", _asap_id: data._asap_id})
             asap.onmessage(data._asap_message)
           } catch (error) {
-            asap.debug && console.log(error)
+           asap.ondebug(error)
           }
         }
         break
@@ -112,12 +110,9 @@ peerSocket.addEventListener("message", event => {
 
 
 const asap = {
-  debug: false,
-  setDebug: (bool) => {
-    asap.debug = bool ? true : false;
-  },
   send: send,
-  onmessage: () => {}
+  onmessage: () => {},
+  ondebug: (msg) => {}
 }
 
 export default asap
