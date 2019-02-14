@@ -12,12 +12,13 @@ const get_queue = () => {
       return []
     }
   } catch (error) {
-    return []
+	asap.debug && console.log(error)
+	return []
   }
 }
 
 const enqueue = (data) => {
-  debug && console.log("Enqueue Message ID #" + data._asap_id)
+  asap.debug && console.log("Enqueue Message ID #" + data._asap_id)
   // Add the message to the queue
   const queue = get_queue()
   queue.push(data)
@@ -25,14 +26,14 @@ const enqueue = (data) => {
   try {
     writeFileSync("_asap_queue", queue, "cbor")
   } catch (error) {
-    debug && console.log(error)
+    asap.debug && console.log(error)
   }
   // Attempt to send all data
   send_all()
 }
 
 const dequeue = (id) => {
-  debug && console.log("Dequeue Message ID #" + id)
+  asap.debug && console.log("Dequeue Message ID #" + id)
   // Remove the message from the queue
   const queue = get_queue()
   for (let i in queue) {
@@ -45,7 +46,7 @@ const dequeue = (id) => {
   try {
     writeFileSync("_asap_queue", queue, "cbor")
   } catch (error) {
-    debug && console.log(error)
+    asap.debug && console.log(error)
   }
 }
 
@@ -72,7 +73,7 @@ const send_all = () => {
     try {
       peerSocket.send(data)
     } catch (error) {
-      debug && console.log(error)
+      asap.debug && console.log(error)
     }
   }
 }
@@ -98,7 +99,7 @@ peerSocket.addEventListener("message", event => {
             peerSocket.send({_asap_status: "received", _asap_id: data._asap_id})
             asap.onmessage(data._asap_message)
           } catch (error) {
-            debug && console.log(error)
+            asap.debug && console.log(error)
           }
         }
         break
@@ -110,6 +111,10 @@ peerSocket.addEventListener("message", event => {
 })
 
 const asap = {
+  debug: false,
+  setDebug: (bool) => {
+	  this.debug = bool;
+  },
   send: send,
   onmessage: () => {}
 }
